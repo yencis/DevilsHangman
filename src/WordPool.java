@@ -15,7 +15,7 @@ public class WordPool {
 		wordLength = length;
 		patternSet = new char[wordLength];
 		Arrays.fill(patternSet,'_');
-		p = getPattern();
+		p = calcPattern(patternSet,false,'i');
 		try {
 			initWP();
 		}catch(Exception e){
@@ -23,17 +23,43 @@ public class WordPool {
 		}
 	}
 	
-	public Pattern getPattern() {
+	public char[] getPatternSet() {
+		return patternSet;
+	}
+	
+	public Pattern calcPattern(char[] patternSet, boolean invert, char i) {
 		String regex = "(^)";
 		for (char c : patternSet) {
 			if (c=='_')
 				regex+="(.)";
+			else
+				regex+=(invert&&c==i)?"([^"+c+"])":"(["+c+"])";
+		}
+		regex+="($)";
+		return Pattern.compile(regex);
+	}
+	
+	public Pattern calcPattern(char[] patternSet, char fix) {
+		String regex = "(^)";
+		for (char c : patternSet) {
+			if (c=='_')
+				regex+="([^"+fix+"])";
 			else
 				regex+="(["+c+"])";
 		}
 		regex+="($)";
 		return Pattern.compile(regex);
 	}
+	
+	public boolean randomRoll() {
+		int a = (int)(Math.random()*10);
+		if (a==3) {
+			return false;
+		}else {
+			return true;
+		}
+	}
+	
 	
 	public void initWP() throws IOException{
 		BufferedReader f = new BufferedReader(new FileReader("dictionary.txt"));
@@ -45,13 +71,102 @@ public class WordPool {
 				st = new StringTokenizer(f.readLine());
 				curWord = st.nextToken();
 				m = p.matcher(curWord);
-				if (m.find()) {
+				if (m.find()&&randomRoll()) {
 					wordPool.add(curWord);
 				}
 			}catch(Exception e) {
 				break;
 			}
 		}
+	}
+	
+	public LinkedList<String> filter(Pattern p){
+		LinkedList<String> filteredList = new LinkedList<String>();
+		Matcher m;
+		for (String s: wordPool) {
+			m = p.matcher(s);
+			if (m.find()) {
+				filteredList.add(s);
+			}
+		}
+		return filteredList;
+	}
+	
+	public boolean narrow(char c) {
+		boolean acceptLetter = true;
+		int maxSize = 0;
+		char[] tempPattern = new char[wordLength];
+		char[] maxTempPattern = new char[wordLength];
+		LinkedList<String> largestWordFamily = new LinkedList<String>();
+		LinkedList<String> wordFamily;
+		System.arraycopy(patternSet, 0, tempPattern, 0, wordLength);
+		//try having letter
+		for (int i = 0;i<wordLength;i++) {
+			if (tempPattern[i]=='_') {
+				tempPattern[i]=c;
+				wordFamily = filter(calcPattern(tempPattern,c));
+				if (wordFamily.size()>maxSize) {
+					largestWordFamily = new LinkedList<String>(wordFamily);
+					maxSize = wordFamily.size();
+					System.arraycopy(tempPattern, 0, maxTempPattern, 0, wordLength);
+				}
+				tempPattern[i] = '_';
+			}
+		}
+		//--try not having the letter
+		for (int i = 0;i<wordLength;i++) {
+			if (tempPattern[i]=='_') {
+				tempPattern[i]=c;
+			}
+		}
+		wordFamily = filter(calcPattern(tempPattern,true,c));
+		if (wordFamily.size()>maxSize) {
+			acceptLetter = false;
+			largestWordFamily = new LinkedList<String>(wordFamily);
+			maxSize = wordFamily.size();
+		}
+		//---check for duplicates
+		if (maxSize==0) {
+			String greatestKey ="";
+			int freq = 0;
+			HashMap<String,Integer> map = new HashMap<String,Integer>();
+			for (String x: wordPool) {
+				String location = "";
+				for (int i = 0;i<wordLength;i++) {
+					if (x.charAt(i)==c) {
+						location+=i+" ";
+					}
+				}
+				if (map.containsKey(location)) {
+					map.replace(location, map.get(location)+1);
+				}else {
+					map.put(location, 1);
+				}
+			}
+			for (String key : map.keySet()) {
+				int val = map.get(key);
+				if (val>freq) {
+					freq = val;
+					greatestKey = key;
+				}
+			}
+			System.arraycopy(patternSet, 0, tempPattern, 0, wordLength);
+			String[] seg = greatestKey.split(" ");
+			for (String s : seg) 
+				tempPattern[Integer.parseInt(s)] = c;
+			largestWordFamily = filter(calcPattern(tempPattern,false,'i'));
+			System.arraycopy(tempPattern, 0, maxTempPattern, 0, wordLength);
+		}
+		
+		
+		if (acceptLetter) {
+			System.arraycopy(maxTempPattern, 0, patternSet, 0, wordLength);
+			wordPool = new LinkedList<String>(largestWordFamily);
+			p = calcPattern(maxTempPattern,false,'i');
+		}else {
+			wordPool = new LinkedList<String>(largestWordFamily);
+		}
+		return acceptLetter;
 	}
 	
 	public LinkedList<String> getWordPool(){

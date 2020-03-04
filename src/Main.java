@@ -9,8 +9,7 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		BufferedReader f = new BufferedReader(new FileReader("dictionary.txt"));
-		StringTokenizer st = new StringTokenizer(f.readLine());
+		
 		/*
 		String line = "calcium";
 		String pattern = "(^)(.{7})($)";
@@ -21,11 +20,18 @@ public class Main {
 		}else {
 			System.out.println("No solute");
 		}*/
-		
-		/*WordPool wp = new WordPool(20);
+		/*
+		WordPool wp = new WordPool(6);
+		System.out.println(wp.getWordPool().size());
+		System.out.println(wp.narrow('e'));
+		System.out.println(wp.getWordPool().size());
+		//for (String w:wp.getWordPool())System.out.println(w);
+		System.out.println(wp.p);
+		/*
 		for (String w:wp.getWordPool())System.out.println(w);
 		System.out.println(wp.getWordPool().size());*/
 		
+		Hangman game = new Hangman();
 	}
 
 }
