@@ -9,12 +9,12 @@ public class Hangman {
 	private boolean isWin = false;
 	
 	public Hangman() {
-		int length = (int)(Math.random()*20)+2;
+		int length = (int)(Math.random()*15)+2;
 		wp = new WordPool(length);
 		initialize();
 	}
 	public void initialize() {
-		guesses = 15;
+		guesses = 10;
 		letters = wp.getPatternSet();
 		usedLetters = new PriorityQueue<Character>();
 		run();
@@ -36,7 +36,7 @@ public class Hangman {
 	}
 	
 	public void printBoard() {
-		//System.out.println(wp.p+" "+wp.wordPool.size()+" "+wp.wordPool.get(0));
+		//System.out.println(wp.wordPool.size()+" "+wp.wordPool.get(0));
 		System.out.println("Used characters: ");
 		PriorityQueue<Character> pq = new PriorityQueue<Character>(usedLetters);
 		while(!pq.isEmpty())System.out.print(pq.remove()+" ");

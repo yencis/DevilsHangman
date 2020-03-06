@@ -101,7 +101,7 @@ public class WordPool {
 		LinkedList<String> wordFamily;
 		System.arraycopy(patternSet, 0, tempPattern, 0, wordLength);
 		//try having letter
-		for (int i = 0;i<wordLength;i++) {
+		/*for (int i = 0;i<wordLength;i++) {
 			if (tempPattern[i]=='_') {
 				tempPattern[i]=c;
 				wordFamily = filter(calcPattern(tempPattern,c));
@@ -124,7 +124,7 @@ public class WordPool {
 			acceptLetter = false;
 			largestWordFamily = new LinkedList<String>(wordFamily);
 			maxSize = wordFamily.size();
-		}
+		}*/
 		//---check for duplicates
 		if (maxSize==0) {
 			String greatestKey ="";
@@ -137,6 +137,7 @@ public class WordPool {
 						location+=i+" ";
 					}
 				}
+				if (location=="")location = "-1";
 				if (map.containsKey(location)) {
 					map.replace(location, map.get(location)+1);
 				}else {
@@ -151,11 +152,22 @@ public class WordPool {
 				}
 			}
 			System.arraycopy(patternSet, 0, tempPattern, 0, wordLength);
-			String[] seg = greatestKey.split(" ");
-			for (String s : seg) 
-				tempPattern[Integer.parseInt(s)] = c;
-			largestWordFamily = filter(calcPattern(tempPattern,false,'i'));
-			System.arraycopy(tempPattern, 0, maxTempPattern, 0, wordLength);
+			if (greatestKey.contentEquals("-1")) {
+				for (int i = 0;i<wordLength;i++) {
+					if (tempPattern[i]=='_') {
+						tempPattern[i] = c;
+					}
+				}
+				largestWordFamily = filter(calcPattern(tempPattern,true,c));
+				acceptLetter = false;
+				//System.arraycopy(tempPattern, 0, maxTempPattern, 0, wordLength);
+			}else {
+				String[] seg = greatestKey.split(" ");
+				for (String s : seg) 
+					tempPattern[Integer.parseInt(s)] = c;
+				largestWordFamily = filter(calcPattern(tempPattern,c));
+				System.arraycopy(tempPattern, 0, maxTempPattern, 0, wordLength);
+			}
 		}
 		
 		
