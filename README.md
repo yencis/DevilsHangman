@@ -13,6 +13,6 @@ The main difficulty for this project was learning effective usage of Java regula
 **Concerning graphics:**
  * Due to the simplicity of this program, we were able to use the code and create a fully functioning Android app with the help of [MysticWorks](https://github.com/mysticworks). (Not on store)
  * This Android app has all the functionalities of the original program with the addition of a dictionary definition of the final word. (This was added because we had no idea what the words meant)
- * The dictionary implementation uses the Online Dictionary API and XML file reading. Code here: https://github.com/yencis/XMLReader/blob/master/README.md
+ * The dictionary implementation uses the Online Dictionary API and XML file reading. Code here: https://github.com/yencis/XMLReader
  
 ![Android App](hangman.png)
